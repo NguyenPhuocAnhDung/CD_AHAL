@@ -11,7 +11,7 @@ from collections import Counter
 # ==========================================
 # 1. CẤU HÌNH HỆ THỐNG
 # ==========================================
-BASE_DATASET_PATH = "D:/DACN/dataset/raw"
+BASE_DATASET_PATH = "../../dataset/raw"
 
 DIRS = {
     "CIC2017":  (os.path.join(BASE_DATASET_PATH, "CICDDoS2017"), "parquet", True),
@@ -23,7 +23,7 @@ DIRS = {
 }
 
 # [OUTPUT] Folder lưu trữ kết quả cuối cùng
-OUTPUT_PATH = "../../dataset/processed_v3_unified"
+OUTPUT_PATH = "../../dataset/processed_v3_unified_111111"
 if not os.path.exists(OUTPUT_PATH): os.makedirs(OUTPUT_PATH)
 
 TARGET_COLS = [
