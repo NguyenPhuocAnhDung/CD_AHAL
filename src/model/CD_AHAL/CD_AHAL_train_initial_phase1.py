@@ -14,8 +14,8 @@ from tabulate import tabulate
 # ==========================================
 # 1. CẤU HÌNH & PATH
 # ==========================================
-DATA_PATH = "D:/DoAnChuyenNganh/dataset/processed_v3_unified"
-BASE_OUTPUT = "../../../baocao/CD_AHAL_FINAL_FULL_METRICS_FINAL"
+DATA_PATH = r"D:\1.Cong_Viec\NguyencuuKhoaHoc\CD_AHAL\dataset\processed_v3_unified_111111"
+BASE_OUTPUT = r"../../../baocao/CD_AHAL_FINAL_FULL_METRICS_FINAL"
 MODEL_PATH = os.path.join(BASE_OUTPUT, "models")
 PLOT_PATH = os.path.join(BASE_OUTPUT, "plots_train")
 REPORT_PATH = os.path.join(BASE_OUTPUT, "reports_train")

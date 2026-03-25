@@ -68,8 +68,8 @@ def main():
     if x_drift[0] != 0:
         x_drift = np.insert(x_drift, 0, 0)
         y_drift = np.insert(y_drift, 0, y_drift[0])
-    if x_drift[-1] < 247:
-        x_drift = np.append(x_drift, 247)
+    if x_drift[-1] < 249:
+        x_drift = np.append(x_drift, 249)
         y_drift = np.append(y_drift, y_drift[-1])
         
     plt.plot(x_drift, y_drift, color='#d62728', linewidth=2.5, label='CD-AHAL (Trend)', alpha=0.9)

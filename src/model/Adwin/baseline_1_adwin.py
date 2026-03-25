@@ -6,19 +6,20 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers, backend as K
 from river import drift
-from sklearn.metrics import accuracy_score
+# [UPDATE 1] Import thêm các metrics cần thiết
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 # ==========================================
-# CẤU HÌNH ĐỒNG BỘ (Batch 247)
+# CẤU HÌNH ĐỒNG BỘ (Batch 249 để khớp với CD-AHAL)
 # ==========================================
 DATA_PATH = "../../../dataset/processed_v3_unified"
 MODEL_PATH = "../../../baocao/CD_AHAL_FINAL_FULL_METRICS_FINAL/models/CD_AHAL_model_A_initial.h5"
 OUTPUT_PATH = "../../../baocao/BASELINES_RESULT"
-TARGET_BATCHES = 247  # <--- KHỚP VỚI CD-AHAL
+TARGET_BATCHES = 249  # <--- KHỚP VỚI CD-AHAL
 
 if not os.path.exists(OUTPUT_PATH): os.makedirs(OUTPUT_PATH)
 
-# --- Custom Layers ---
+# --- Custom Layers (Giữ nguyên) ---
 @tf.keras.utils.register_keras_serializable()
 class AttentionLayer(layers.Layer):
     def __init__(self, **kwargs): super().__init__(**kwargs)
@@ -44,7 +45,7 @@ def main():
         feat_cols = [c for c in df.columns if c not in ['Label', 'Label_Multi', 'Label_Bin']]
         X_raw = df[feat_cols].values
         y_raw = df['Label'].values
-    except: print("❌ Lỗi data!"); return
+    except Exception as e: print(f"❌ Lỗi data: {e}"); return
 
     # 2. Load Model
     try:
@@ -75,9 +76,15 @@ def main():
         preds = model.predict(X_seq, verbose=0)
         inf_time = (time.time() - t0) * 1000
         
-        acc = accuracy_score(y_seq, (preds > 0.5).astype(int).flatten())
+        # [UPDATE 2] Tính toán 4 chỉ số
+        y_pred_bin = (preds > 0.5).astype(int).flatten()
         
-        # Drift Check
+        acc = accuracy_score(y_seq, y_pred_bin)
+        pre = precision_score(y_seq, y_pred_bin, zero_division=0)
+        rec = recall_score(y_seq, y_pred_bin, zero_division=0)
+        f1 = f1_score(y_seq, y_pred_bin, zero_division=0)
+        
+        # Drift Check (ADWIN dùng accuracy hoặc error rate)
         adwin.update(1.0 - acc)
         status = "Normal"
         train_time = 0
@@ -88,12 +95,15 @@ def main():
             model.fit(X_seq, y_seq, epochs=1, batch_size=64, verbose=0) # Train nhẹ
             train_time = (time.time() - t1) * 1000
             
-        log.append([i, acc, inf_time, train_time, status])
+        # [UPDATE 3] Log đầy đủ thông tin
+        log.append([i, acc, pre, rec, f1, inf_time, train_time, status])
         
-        if i % 20 == 0: print(f"Batch {i}/{TARGET_BATCHES}: {status} | Acc: {acc:.4f}")
+        if i % 20 == 0: 
+            print(f"Batch {i}/{TARGET_BATCHES}: {status} | Acc: {acc:.4f} | F1: {f1:.4f}")
 
-    # Save
-    pd.DataFrame(log, columns=['Batch', 'Accuracy', 'Inf_Time', 'Train_Time', 'Status']).to_csv(os.path.join(OUTPUT_PATH, "Baseline_ADWIN.csv"), index=False)
-    print("✅ Done Baseline 1.")
+    # [UPDATE 4] Save với header mới
+    cols = ['Batch', 'Accuracy', 'Precision', 'Recall', 'F1-Score', 'Inf_Time', 'Train_Time', 'Status']
+    pd.DataFrame(log, columns=cols).to_csv(os.path.join(OUTPUT_PATH, "Baseline_ADWIN.csv"), index=False)
+    print("✅ Done Baseline 1. Results saved to Baseline_ADWIN.csv")
 
 if __name__ == "__main__": main()
