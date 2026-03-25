@@ -48,7 +48,7 @@ def main():
     
     # Plot Baselines
     plt.plot(df_arf['Batch'], df_arf['Accuracy'].rolling(window).mean(), 
-             label='Adaptive Random Forest (SOTA)', color='#2ca02c', linewidth=2, linestyle='--')
+             label='Adaptive Random Forest (ARF)', color='#2ca02c', linewidth=2, linestyle='--')
     plt.plot(df_odl['Batch'], df_odl['Accuracy'].rolling(window).mean(), 
              label='Online Deep Learning (ODL)', color='#ff7f0e', linewidth=2, alpha=0.8)
     plt.plot(df_periodic['Batch'], df_periodic['Accuracy'].rolling(window).mean(), 
